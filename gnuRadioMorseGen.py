@@ -15,13 +15,6 @@ class WSPR(gr.sync_block):
     """
     docstring for block 
     """
-    #Call sign of transmitter, must be a string, must be at least 4 characters, no more than 6, character 3 must be an int
-    #Grid locator, must be 4 characters, first two must be letters, second two must be numbers
-    #Power is transmitter power in dBm, range 0 - 60
-    #Sample rate is the sample rate that the GNU enviroment is set to
-    #Center Beacon Frequency is the value of the central tone of a 3 part communication beacon
-    #Center offset is the distance in frequency that the WSPR signal is offset from central tone
-    #Amplitude is the amplitude of the signal
     def __init__(self, word = 'Haystack Observatory', dotLength = 0.5, sampleRate = 48000, centerBeaconFreq = 10000, centerOffSet = 10000, debug = 0, repeat = 0, minVal = 0 ):
         gr.sync_block.__init__(self,
             name="Morse Code Generator",
@@ -39,10 +32,7 @@ class WSPR(gr.sync_block):
         self.time = 0
         self.state = 0
         self.B = 10000.0
-        """
-        if self.callsign[1] == '' or self.callsign[1] <= '9':
-            raise ValueError("The second char of the callsign must be a letter")
-        """
+        self.finalOutputString = "00000"
         #Incrementing variables for the output
         self.buffer_index = 0
         self.sampleCount = 0
@@ -63,30 +53,30 @@ class WSPR(gr.sync_block):
         else: 
             for char in word: 
                 outputString += morseDic[char] + "0"
-        #finalOutputString = "313130 "
-        finalOutputString = "1110101110101110000000" #initialize with 'CT' prosign to indicate the start of a message
+        #First transmission has a delay, and the message starts with prosign
+        self.finalOutputString = self.finalOutputString + "1110101110101110000000"
         for char in outputString:
             match char: 
                 case "3": 
-                    finalOutputString += "1110"
+                    self.finalOutputString += "1110"
                 case "7": 
-                    finalOutputString += "000000" 
+                    self.finalOutputString += "000000" 
                 case "0": 
-                    finalOutputString += "00" 
+                    self.finalOutputString += "00" 
                 case "1": 
-                    finalOutputString += "10" 
+                    self.finalOutputString += "10" 
                 case _: 
                     print("Unknown Symbol")
-        finalOutputString = finalOutputString + "000000111010111010111" #add 'AR' prosign to indicate end of message
+        self.finalOutputString = self.finalOutputString + "0000001011101011101" #add 'AR' prosign to indicate end of message
         self.numSamplesTX = int(dotLength*self.sampleRate)
-        return finalOutputString
+        return self.finalOutputString
            
     def work(self, input_items, output_items):
         out = output_items[0]
         noutput_items = len(out)
         n_written = 0
         
-        # --- STATE 1: Idle/Waiting for repeat timer to elapse ---
+        # Idle/Waiting for repeat timer to elapse 
         if self.repeat != 0 and self.state == 1:
             if time.time() >= self.wait_start_time + self.repeat:
                 # Wait time completed. Reset transmission indexes and transition back to Transmitting state
@@ -98,7 +88,7 @@ class WSPR(gr.sync_block):
                 out[:] = 0 + 0j
                 return noutput_items
         
-        # --- STATE 0: Transmitting symbols ---
+        # Transmitting symbols
         while n_written < noutput_items:
             if self.buffer_index < len(self.symbol_buffer):
                 # How many samples does the current symbol still need?
@@ -110,7 +100,7 @@ class WSPR(gr.sync_block):
                 
                 # Calculate frequency and phase steps for the current symbol
                 current_symbol = float(self.symbol_buffer[self.buffer_index])
-                if current_symbol == 0: 
+                if current_symbol== 0: 
                     current_symbol = self.minVal
                 phase = (2.0 * np.pi * (self.CBF + self.centerOffSet) / self.sampleRate)
                 
