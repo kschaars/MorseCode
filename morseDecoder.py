@@ -31,7 +31,7 @@ class wsprd_time_synced_block(gr.sync_block):
             '1111':'H','11':'I','1333':'J','313':'K','1311':'L','33':'M','31':'N',
             '333':'O','1331':'P','3313':'Q','131':'R','111':'S','3':'T','113':'U',
             '1113':'V','133':'W','3113':'X','3133':'Y','3311':'Z',
-            '13333':'1','11333':'2','11133':'3','11113':'4','11111':'5',
+            '13333':'1','11333':'2','311113':'3','11113':'4','11111':'5',
             '31111':'6','33111':'7','33311':'8','33331':'9','33333':'0',
             '331133':', ','131313':'.','113311':'?','31131':'/','31331':'(',
             '313313':')',
@@ -57,8 +57,8 @@ class wsprd_time_synced_block(gr.sync_block):
         self.filter_state = np.zeros(len(self.h)-1, dtype=np.complex64)
 
     def _estimate_unit(self, on_runs):
-        """Estimate the dot length from ON-pulse durations.
-        Returns (dot, dash, ok) where ok flags whether the 3:1 ratio held"""
+        """Estimate the dot length (in counts) from ON-pulse durations.
+        Returns (dot, dash, ok) where ok flags whether the 3:1 ratio held."""
         v = sorted(float(x) for x in on_runs if x > 0)
         if len(v) < 2:
             return (v[0], v[0]*3, False) if v else (None, None, False)
@@ -79,7 +79,7 @@ class wsprd_time_synced_block(gr.sync_block):
                 break
             lo, hi = nlo, nhi
         ratio = hi / lo if lo > 0 else 0
-        # If the two clusters are close, the message is probably all dots or all
+        # If the two clusters are close, the message is probably all dots all
         # dashes
         if ratio < 1.8:
             dot = np.median(v)
@@ -92,7 +92,8 @@ class wsprd_time_synced_block(gr.sync_block):
         filtered_in0, self.filter_state = signal.lfilter(self.h, 1, in0, zi=self.filter_state)
         n = len(filtered_in0)
         out_data[:n] = filtered_in0
-
+        if self.filterOnly == 1: 
+            return n
         self.finalList = []
         self.textOutput = ''
 
@@ -123,7 +124,7 @@ class wsprd_time_synced_block(gr.sync_block):
                         self.bits.append(0)
                     if self.highDurCounter == 0 and len(self.dotTimeArr) >= 3:
                         dot_est = np.median(self.dotTimeArr)      # running estimate
-                        if self.lowDurCounter >= 10 * dot_est:    # long silence indicates end of message
+                        if self.lowDurCounter >= 10 * dot_est:    # long silence => done
                             self.state = 1
                     self.d_count = self.deci
                 ni += 1
@@ -157,7 +158,7 @@ class wsprd_time_synced_block(gr.sync_block):
             return -1
         min_run = 0.4 * dot
 
-        #glitch removal by absorbing all sub-0.4-dot runs, then re-merge
+        #glitch removal: absorb sub-0.4-dot runs, then re-merge
         cleaned = []
         for state, length in rle:
             if length < min_run and cleaned:
