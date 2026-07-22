@@ -1,0 +1,71 @@
+id: Morse_Encoder_Block
+label: Morse Code Generator
+category: '[Haystack]'
+
+file_format: 1
+
+parameters:
+- id: word
+  label: Message
+  dtype: string
+  default: 'Haystack Observatory'
+
+- id: dotLength
+  label: Dot Length (s)
+  dtype: float
+  default: '0.5'
+
+- id: sampleRate
+  label: Sample Rate
+  dtype: float
+  default: samp_rate
+
+- id: centerBeaconFreq
+  label: Center Beacon Freq (Hz)
+  dtype: float
+  default: '0'
+
+- id: centerOffSet
+  label: Center Offset (Hz)
+  dtype: float
+  default: '1000'
+
+- id: minVal
+  label: Off-State Amplitude
+  dtype: float
+  default: '0.0'
+  hide: part
+- id: repeat
+  label: Repeat Delay (s)
+  dtype: float
+  default: '0'
+  hide: part
+
+- id: debug
+  label: Debug Mode
+  dtype: int
+  default: '0'
+  options: ['0', '1']
+  option_labels: ['Disabled', 'Enabled']
+  hide: part
+
+inputs: []
+
+outputs:
+- label: out
+  domain: stream
+  dtype: complex
+
+templates:
+  imports: import haystack
+  make: |-
+    haystack.WSPR(
+        word=${word},
+        dotLength=${dotLength},
+        sampleRate=${sampleRate},
+        centerBeaconFreq=${centerBeaconFreq},
+        centerOffSet=${centerOffSet},
+        debug=${debug},
+        repeat=${repeat},
+        minVal=${minVal}
+    )

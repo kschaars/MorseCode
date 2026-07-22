@@ -1,0 +1,58 @@
+id: Morse_Decoder_Block
+label: Morse Decoder Block
+category: '[Haystack]'
+
+file_format: 1
+
+parameters:
+- id: sample_rate
+  label: Sample Rate
+  dtype: float
+  default: samp_rate
+
+- id: signalCenterFrequency
+  label: Center Frequency (Hz)
+  dtype: float
+  default: '1000'
+
+- id: maxRecordLength
+  label: Max Record Length (s)
+  dtype: float
+  default: '60'
+
+- id: filterOnly
+  label: Mode
+  dtype: int
+  default: '1'
+  options: ['1', '0']
+  option_labels: ['Filter Only (Pass-through)', 'Filter & Decode Morse']
+  hide: part
+
+- id: debug
+  label: Debug Mode
+  dtype: int
+  default: '0'
+  options: ['0', '1']
+  option_labels: ['Disabled', 'Enabled']
+  hide: part
+
+inputs:
+- label: in
+  domain: stream
+  dtype: complex
+
+outputs:
+- label: out
+  domain: stream
+  dtype: complex
+
+templates:
+  imports: import haystack
+  make: |-
+    haystack.wsprd_time_synced_block(
+        sample_rate=${sample_rate},
+        signalCenterFrequency=${signalCenterFrequency},
+        maxRecordLength=${maxRecordLength},
+        filterOnly=${filterOnly},
+        debug=${debug}
+    )

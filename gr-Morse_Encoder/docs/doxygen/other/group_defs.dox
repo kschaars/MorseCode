@@ -1,0 +1,6 @@
+/*!
+ * \defgroup block GNU Radio MORSE_ENCODER C++ Signal Processing Blocks
+ * \brief All C++ blocks that can be used from the MORSE_ENCODER GNU Radio
+ *        module are listed here or in the subcategories below.
+ *
+ */
