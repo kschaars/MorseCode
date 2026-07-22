@@ -1,6 +1,6 @@
 These programs are designed to be run in GNU radio in order to generate and decode AM Morse code signals.
 
-#### Encode Block (gnuRadioMorseGen.py):
+#### Encode Block:
 * The generator take in 8 base variables:
   * **word**: The text that you want to encode and transmit
   * **Dotlength**: the base unit of time for the encoder that is the time of a dot (in seconds). All other durations are based on this value
@@ -28,7 +28,7 @@ These programs are designed to be run in GNU radio in order to generate and deco
   * 0 - 9
   * , . ? / ( ) _space_
 
-#### Decode Block (morseDecoder.py):
+#### Decode Block:
 * This block takes in 5 base variables:
   * **Sample_rate**: sample rate of GNU radio flowchart block is working within
   * **SignalCenterFrequency**: The frequency that the Morse code signal is centered at
