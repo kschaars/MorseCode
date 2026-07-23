@@ -20,5 +20,5 @@ except ModuleNotFoundError:
     pass
 
 # import any pure python here
-from .Morse_Encoder_Block import Morse_Encoder_Block
+from .Morse_Encoder_Block import WSPR
 #

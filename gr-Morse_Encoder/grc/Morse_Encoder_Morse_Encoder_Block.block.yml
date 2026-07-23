@@ -35,6 +35,7 @@ parameters:
   dtype: float
   default: '0.0'
   hide: part
+
 - id: repeat
   label: Repeat Delay (s)
   dtype: float
@@ -57,9 +58,9 @@ outputs:
   dtype: complex
 
 templates:
-  imports: import haystack
+  imports: from gnuradio import Morse_Encoder 
   make: |-
-    haystack.WSPR(
+    Morse_Encoder.WSPR(
         word=${word},
         dotLength=${dotLength},
         sampleRate=${sampleRate},
