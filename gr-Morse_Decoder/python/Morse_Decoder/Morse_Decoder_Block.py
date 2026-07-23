@@ -100,8 +100,6 @@ class wsprd_time_synced_block(gr.sync_block):
         out_data[:n] = filtered_in0
         if self.filterOnly == 1: 
             return n
-        print("filter") 
-        return -1
         self.finalList = []
         self.textOutput = ''
 
@@ -141,7 +139,8 @@ class wsprd_time_synced_block(gr.sync_block):
             
         if len(self.dotTimeArr) == 0:
             print("No Morse pulses recorded.")
-            return -1
+            self.ninputItems = 0 
+            return n
         try:
             start_index = self.bits.index(1)
             self.bits = self.bits[start_index:]

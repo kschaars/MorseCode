@@ -47,9 +47,9 @@ outputs:
   dtype: complex
 
 templates:
-  imports: import haystack
+  imports: from gnuradio import Morse_Decoder
   make: |-
-    haystack.wsprd_time_synced_block(
+    Morse_Decoder.wsprd_time_synced_block(
         sample_rate=${sample_rate},
         signalCenterFrequency=${signalCenterFrequency},
         maxRecordLength=${maxRecordLength},

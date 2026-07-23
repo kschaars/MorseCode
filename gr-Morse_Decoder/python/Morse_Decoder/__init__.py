@@ -15,10 +15,10 @@ import os
 # import pybind11 generated symbols into the Binary_Decoder namespace
 try:
     # this might fail if the module is python-only
-    from .Binary_Decoder_python import *
+    from .Morse_Decoder_python import *
 except ModuleNotFoundError:
     pass
 
 # import any pure python here
-from .Binary_Decoder_Block import Binary_Decoder_Block
+from .Morse_Decoder_Block import wsprd_time_synced_block
 #
